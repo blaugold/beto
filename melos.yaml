@@ -1,0 +1,41 @@
+name: beto
+repository: https://github.com/blaugold/beto
+
+packages:
+  - .
+  - packages/**
+
+ide:
+  intellij: false
+
+command:
+  bootstrap:
+    usePubspecOverrides: true
+  version:
+    branch: main
+    linkToCommits: true
+
+scripts:
+  code-gen:
+    exec: dart run build_runner build --delete-conflicting-outputs
+    select-package:
+      scope:
+        - beto_common
+        - beto_client
+
+  code-gen:check:
+    run: dart tool/check_code_gen.dart
+
+  format:
+    run: dart format .
+
+  format:check:
+    run: dart format --set-exit-if-changed .
+
+  analyze:
+    exec: dart analyze --fatal-infos
+
+  test:
+    exec: dart test
+    select-package:
+      dir-exists: test
