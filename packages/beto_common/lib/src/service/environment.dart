@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:json_annotation/json_annotation.dart';
 
-import 'io_utils.dart';
+import '../io_utils.dart';
 
 part 'environment.g.dart';
 
@@ -17,7 +17,7 @@ class Environment {
     this.runtime,
   });
 
-  factory Environment.fromJson(Map<String, dynamic> json) =>
+  factory Environment.fromJson(Map<String, Object?> json) =>
       _$EnvironmentFromJson(json);
 
   final DateTime startTime;
@@ -55,7 +55,7 @@ class Os {
     required this.versionString,
   });
 
-  factory Os.fromJson(Map<String, dynamic> json) => _$OsFromJson(json);
+  factory Os.fromJson(Map<String, Object?> json) => _$OsFromJson(json);
 
   factory Os.current() {
     final OsType type;
@@ -84,7 +84,7 @@ class Os {
   @override
   String toString() => 'Os(type: $type, versionString: $versionString)';
 
-  Map<String, dynamic> toJson() => _$OsToJson(this);
+  Map<String, Object?> toJson() => _$OsToJson(this);
 }
 
 enum Arch {
@@ -103,7 +103,7 @@ class Cpu {
     required this.cores,
   });
 
-  factory Cpu.fromJson(Map<String, dynamic> json) => _$CpuFromJson(json);
+  factory Cpu.fromJson(Map<String, Object?> json) => _$CpuFromJson(json);
 
   factory Cpu.current() => Cpu(
         model: _currentModel(),
@@ -118,7 +118,7 @@ class Cpu {
   @override
   String toString() => 'Cpu(model: $model, arch: $arch, cores: $cores)';
 
-  Map<String, dynamic> toJson() => _$CpuToJson(this);
+  Map<String, Object?> toJson() => _$CpuToJson(this);
 
   static String _currentModel() {
     if (Platform.isMacOS || Platform.isIOS) {
@@ -186,7 +186,7 @@ class Runtime {
     required this.version,
   });
 
-  factory Runtime.fromJson(Map<String, dynamic> json) =>
+  factory Runtime.fromJson(Map<String, Object?> json) =>
       _$RuntimeFromJson(json);
 
   factory Runtime.dart() => Runtime(
@@ -200,5 +200,5 @@ class Runtime {
   @override
   String toString() => 'Runtime(name: $name, version: $version)';
 
-  Map<String, dynamic> toJson() => _$RuntimeToJson(this);
+  Map<String, Object?> toJson() => _$RuntimeToJson(this);
 }
