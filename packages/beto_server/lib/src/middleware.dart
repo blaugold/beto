@@ -1,11 +1,15 @@
 // ignore: lines_longer_than_80_chars
 // ignore_for_file: avoid_catches_without_on_clauses, avoid_dynamic_calls, empty_catches
 
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
 import 'package:beto_common/beto_common.dart';
 import 'package:shelf/shelf.dart';
+import 'package:uuid/uuid.dart';
+
+import 'logging.dart';
 
 abstract class HttpException {
   int get statusCode;
@@ -55,8 +59,8 @@ Middleware jsonBody() {
         final Object? body;
         try {
           body = await jsonDecoder.bind(request.read()).first;
-        } catch (e) {
-          // TODO: Logging
+        } catch (error, stackTrace) {
+          logger.info('Received invalid JSON.', error, stackTrace);
           return Response.badRequest(body: 'Invalid JSON.');
         }
 
@@ -112,11 +116,18 @@ extension JsonBodyRequest on Request {
     if (body is T) {
       try {
         return fromJson(body);
-      } catch (e) {
-        // TODO: Logging
+      } catch (error, stackTrace) {
+        logger.info(
+          'Received JSON that could not be deserialized to $R.',
+          error,
+          stackTrace,
+        );
       }
     } else {
-      // TODO: Logging
+      logger.info(
+        'Received JSON body of unexpected type. '
+        'Expected $T but got ${body.runtimeType}.',
+      );
     }
 
     throw _JsonBodyException('Invalid data in JSON body.');
@@ -132,4 +143,43 @@ extension JsonBodyResponse on Response {
 extension ObjectJsonBodyResponse on Object? {
   Response jsonResponse([int statusCode = 200]) =>
       Response(statusCode).addJsonBody(this);
+}
+
+const _requestIdContextKey = 'beto_server.requestId';
+
+Middleware requestId({bool useRequestCounter = false}) {
+  var requestCounter = 0;
+  return (innerHandler) => (request) async {
+        final String id;
+        if (useRequestCounter) {
+          id = (++requestCounter).toString();
+        } else {
+          id = const Uuid().v4();
+        }
+
+        final updatedRequest =
+            request.change(context: {_requestIdContextKey: id});
+        return runZoned(
+          () => innerHandler(updatedRequest),
+          zoneValues: {
+            _requestIdContextKey: id,
+          },
+        );
+      };
+}
+
+extension RequestIdRequest on Request {
+  bool get hasRequestId => context.containsKey(_requestIdContextKey);
+
+  String get requestId {
+    final id = context[_requestIdContextKey];
+    if (id is String) {
+      return id;
+    }
+    throw StateError('requestId middleware is not installed.');
+  }
+}
+
+extension RequestIdZone on Zone {
+  String? get requestId => this[_requestIdContextKey] as String?;
 }

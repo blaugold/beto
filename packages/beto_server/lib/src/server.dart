@@ -12,6 +12,7 @@ import 'package:shelf/shelf.dart' as shelf;
 import 'package:shelf/shelf_io.dart' as shelf_io;
 
 import 'benchmark_data_store.dart';
+import 'logging.dart';
 import 'middleware.dart';
 import 'service.dart';
 import 'service_handler.dart';
@@ -23,16 +24,25 @@ enum DataStore {
 
 class BetoServer {
   BetoServer({
-    this.debug = false,
+    this.port,
+    this.address,
+    this.logRequests = false,
+    this.useRequestCounter = false,
     this.googleServiceAccountCredentialsPath = 'service-account.json',
     this.dataStore = DataStore.bigQuery,
   });
 
   static const _googleCloudScopes = [BigqueryApi.bigqueryScope];
 
-  final bool debug;
+  final int? port;
+  final InternetAddress? address;
+  final bool logRequests;
+  final bool useRequestCounter;
   final String googleServiceAccountCredentialsPath;
   final DataStore dataStore;
+
+  int get _port => port ?? 0;
+  InternetAddress get _address => address ?? InternetAddress.loopbackIPv4;
 
   late final _httpClient = _createHttpClient();
   late final _googleCloudClient = _createGoogleCloudClient();
@@ -52,9 +62,8 @@ class BetoServer {
 
     final server = _server = await shelf_io.serve(
       handler,
-      InternetAddress.loopbackIPv4,
-      // TODO: make port configurable
-      0,
+      _address,
+      _port,
       poweredByHeader: null,
     );
     // ignore: cascade_invocations
@@ -62,14 +71,13 @@ class BetoServer {
 
     _onStop(server.close);
 
-    // TODO: Logging
-    // ignore: avoid_print
-    print('Listening on http://${_server.address.host}:${_server.port}');
+    logger.info('Listening on http://${_server.address.host}:${_server.port}');
   }
 
   shelf.Handler _createHandler(BetoService service) {
-    var pipeline = const shelf.Pipeline();
-    if (debug) {
+    var pipeline = const shelf.Pipeline()
+        .addMiddleware(requestId(useRequestCounter: useRequestCounter));
+    if (logRequests) {
       pipeline = pipeline.addMiddleware(shelf.logRequests());
     }
     pipeline = pipeline
@@ -146,6 +154,7 @@ class BetoServer {
       BetoServiceImpl(benchmarkDataStore: await _benchmarkDataStore);
 
   Future<void> stop() async {
+    logger.info('Stopping server...');
     for (final action in _onStopActions) {
       await action();
     }

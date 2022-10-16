@@ -1,16 +1,29 @@
 import 'dart:io';
 
+import 'package:beto_server/src/logging.dart';
 import 'package:beto_server/src/server.dart';
+import 'package:logging/logging.dart';
 
 void main() async {
-  final server = BetoServer();
+  const debug = true;
+  // ignore: prefer_const_declarations
+  final Level? logLevel = null;
+
+  // ignore: dead_code
+  final effectiveLogLevel = logLevel ?? (debug ? Level.FINE : Level.INFO);
+
+  setupLogging(logLevel: effectiveLogLevel, useRequestCounter: debug);
+
+  final server = BetoServer(
+    dataStore: DataStore.inMemory,
+    logRequests: debug,
+    useRequestCounter: debug,
+  );
 
   try {
     await server.start();
-  } on InvalidConfiguration catch (e) {
-    // TODO: Logging
-    // ignore: avoid_print
-    print(e);
+  } on InvalidConfiguration catch (error) {
+    logger.severe('Invalid configuration:\n${error.message}');
     exit(1);
   }
 
