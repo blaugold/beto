@@ -21,7 +21,6 @@ scripts:
     select-package:
       scope:
         - beto_common
-        - beto_client
 
   code-gen:check:
     run: dart tool/check_code_gen.dart

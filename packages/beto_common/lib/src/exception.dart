@@ -9,7 +9,7 @@ class BetoException implements Exception {
     required this.message,
   });
 
-  factory BetoException.fromJson(Map<String, dynamic> json) =>
+  factory BetoException.fromJson(Map<String, Object?> json) =>
       _$BetoExceptionFromJson(json);
 
   final int statusCode;

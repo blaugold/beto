@@ -28,7 +28,7 @@ class Value {
     this.parameters = const {},
   });
 
-  factory Value.fromJson(Map<String, dynamic> json) => _$ValueFromJson(json);
+  factory Value.fromJson(Map<String, Object?> json) => _$ValueFromJson(json);
 
   final Statistic statistic;
   final double value;
@@ -52,7 +52,7 @@ class Metric {
     values?.forEach(addValue);
   }
 
-  factory Metric.fromJson(Map<String, dynamic> json) => _$MetricFromJson(json);
+  factory Metric.fromJson(Map<String, Object?> json) => _$MetricFromJson(json);
 
   final String name;
 
@@ -86,7 +86,7 @@ class Benchmark {
     metrics?.forEach(addMetric);
   }
 
-  factory Benchmark.fromJson(Map<String, dynamic> json) =>
+  factory Benchmark.fromJson(Map<String, Object?> json) =>
       _$BenchmarkFromJson(json);
 
   final String name;
@@ -122,7 +122,7 @@ class Suite {
     benchmarks?.forEach(addBenchmark);
   }
 
-  factory Suite.fromJson(Map<String, dynamic> json) => _$SuiteFromJson(json);
+  factory Suite.fromJson(Map<String, Object?> json) => _$SuiteFromJson(json);
 
   final String name;
   final Environment environment;
