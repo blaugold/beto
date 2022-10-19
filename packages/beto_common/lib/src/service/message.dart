@@ -1,20 +1,20 @@
 import 'package:json_annotation/json_annotation.dart';
 
 import '../json_utils.dart';
-import 'value.dart';
+import 'record.dart';
 
 part 'message.g.dart';
 
 @JsonSerializable()
 class SubmitBenchmarkDataRequest {
   SubmitBenchmarkDataRequest({
-    required this.suite,
+    required this.record,
   });
 
   factory SubmitBenchmarkDataRequest.fromJson(Map<String, Object?> json) =>
       _$SubmitBenchmarkDataRequestFromJson(json);
 
-  final Suite suite;
+  final BenchmarkRecord record;
 
   Map<String, Object?> toJson() => _$SubmitBenchmarkDataRequestToJson(this);
 }
@@ -34,21 +34,22 @@ class QueryBenchmarkDataRequest {
   final String suite;
   final String benchmark;
   final String device;
-  @_QueryRangeJsonConverter()
-  final QueryRange range;
+  @_BenchmarkDataRangeJsonConverter()
+  final BenchmarkDataRange range;
 
   Map<String, Object?> toJson() => _$QueryBenchmarkDataRequestToJson(this);
 }
 
 // ignore: one_member_abstracts
-abstract class QueryRange {
+abstract class BenchmarkDataRange {
   Map<String, Object?> toJson();
 }
 
-class _QueryRangeJsonConverter extends TaggedTypeConverter<QueryRange> {
-  const _QueryRangeJsonConverter()
+class _BenchmarkDataRangeJsonConverter
+    extends TaggedTypeConverter<BenchmarkDataRange> {
+  const _BenchmarkDataRangeJsonConverter()
       : super(
-          'QueryRange',
+          'BenchmarkDataRange',
           const {
             CommitRange: 'commit',
             DateRange: 'date',
@@ -61,7 +62,7 @@ class _QueryRangeJsonConverter extends TaggedTypeConverter<QueryRange> {
 }
 
 @JsonSerializable()
-class CommitRange implements QueryRange {
+class CommitRange implements BenchmarkDataRange {
   CommitRange(this.commit);
 
   factory CommitRange.fromJson(Map<String, Object?> json) =>
@@ -74,7 +75,7 @@ class CommitRange implements QueryRange {
 }
 
 @JsonSerializable()
-class DateRange implements QueryRange {
+class DateRange implements BenchmarkDataRange {
   DateRange({required this.start, required this.end});
 
   factory DateRange.fromJson(Map<String, Object?> json) =>

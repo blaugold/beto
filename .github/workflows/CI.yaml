@@ -41,6 +41,11 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+      - name: Install Google Cloud Service Account
+        env:
+          GOOGLE_CLOUD_SERVICE_ACCOUNT: ${{ secrets.GOOGLE_CLOUD_SERVICE_ACCOUNT }}
+        run: echo "$GOOGLE_CLOUD_SERVICE_ACCOUNT" > packages/beto_server/test-service-account.json
+        shell: bash
       - name: Setup Dart
         uses: dart-lang/setup-dart@v1
         with:

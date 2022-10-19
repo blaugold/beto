@@ -1,8 +1,10 @@
 import 'message.dart';
-import 'value.dart';
+import 'record.dart';
 
 abstract class BetoService {
   Future<void> submitBenchmarkData(SubmitBenchmarkDataRequest request);
 
-  Future<List<Suite>> queryBenchmarkData(QueryBenchmarkDataRequest request);
+  Future<List<BenchmarkRecord>> queryBenchmarkData(
+    QueryBenchmarkDataRequest request,
+  );
 }

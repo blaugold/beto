@@ -6,7 +6,8 @@ export 'src/service/message.dart'
         CommitRange,
         DateRange,
         QueryBenchmarkDataRequest,
-        QueryRange,
+        BenchmarkDataRange,
         SubmitBenchmarkDataRequest;
+export 'src/service/record.dart'
+    show Benchmark, BenchmarkRecord, Metric, Statistic, Suite, Value;
 export 'src/service/service.dart' show BetoService;
-export 'src/service/value.dart' show Benchmark, Metric, Statistic, Suite, Value;

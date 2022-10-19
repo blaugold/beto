@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:beto_server/src/configuration.dart';
 import 'package:beto_server/src/logging.dart';
 import 'package:beto_server/src/server.dart';
 import 'package:logging/logging.dart';
@@ -15,7 +16,7 @@ void main() async {
   setupLogging(logLevel: effectiveLogLevel, useRequestCounter: debug);
 
   final server = BetoServer(
-    dataStore: DataStore.inMemory,
+    dataStoreImpl: DataStoreImpl.inMemory,
     logRequests: debug,
     useRequestCounter: debug,
   );
