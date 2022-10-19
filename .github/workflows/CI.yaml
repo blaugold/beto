@@ -25,11 +25,11 @@ jobs:
       - name: Bootstrap
         run: melos bootstrap
       - name: Check code generation
-        run: melos code-gen:check
+        run: melos code-gen:check --no-select
       - name: Check formatting
-        run: melos format:check
+        run: melos format:check --no-select
       - name: Analyze
-        run: melos analyze
+        run: melos analyze --no-select
 
   test:
     strategy:
@@ -55,4 +55,4 @@ jobs:
       - name: Bootstrap
         run: melos bootstrap
       - name: Test
-        run: melos test
+        run: melos test --no-select

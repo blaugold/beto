@@ -3,10 +3,10 @@ export 'src/service/environment.dart'
     show Arch, Cpu, Environment, Os, OsType, Runtime;
 export 'src/service/message.dart'
     show
+        BenchmarkDataRange,
         CommitRange,
         DateRange,
         QueryBenchmarkDataRequest,
-        BenchmarkDataRange,
         SubmitBenchmarkDataRequest;
 export 'src/service/record.dart'
     show Benchmark, BenchmarkRecord, Metric, Statistic, Suite, Value;
