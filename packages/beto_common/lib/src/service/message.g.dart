@@ -9,13 +9,13 @@ part of 'message.dart';
 SubmitBenchmarkDataRequest _$SubmitBenchmarkDataRequestFromJson(
         Map<String, dynamic> json) =>
     SubmitBenchmarkDataRequest(
-      suite: Suite.fromJson(json['suite'] as Map<String, dynamic>),
+      record: BenchmarkRecord.fromJson(json['record'] as Map<String, dynamic>),
     );
 
 Map<String, dynamic> _$SubmitBenchmarkDataRequestToJson(
         SubmitBenchmarkDataRequest instance) =>
     <String, dynamic>{
-      'suite': instance.suite,
+      'record': instance.record,
     };
 
 QueryBenchmarkDataRequest _$QueryBenchmarkDataRequestFromJson(
@@ -24,7 +24,8 @@ QueryBenchmarkDataRequest _$QueryBenchmarkDataRequestFromJson(
       suite: json['suite'] as String,
       benchmark: json['benchmark'] as String,
       device: json['device'] as String,
-      range: const _QueryRangeJsonConverter().fromJson(json['range'] as List),
+      range: const _BenchmarkDataRangeJsonConverter()
+          .fromJson(json['range'] as List),
     );
 
 Map<String, dynamic> _$QueryBenchmarkDataRequestToJson(
@@ -33,7 +34,7 @@ Map<String, dynamic> _$QueryBenchmarkDataRequestToJson(
       'suite': instance.suite,
       'benchmark': instance.benchmark,
       'device': instance.device,
-      'range': const _QueryRangeJsonConverter().toJson(instance.range),
+      'range': const _BenchmarkDataRangeJsonConverter().toJson(instance.range),
     };
 
 CommitRange _$CommitRangeFromJson(Map<String, dynamic> json) => CommitRange(

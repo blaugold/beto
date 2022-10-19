@@ -42,7 +42,7 @@ class BetoServiceHttpClient extends BetoService {
   }
 
   @override
-  Future<List<Suite>> queryBenchmarkData(
+  Future<List<BenchmarkRecord>> queryBenchmarkData(
     QueryBenchmarkDataRequest request,
   ) async {
     final httpRequest =
@@ -53,7 +53,10 @@ class BetoServiceHttpClient extends BetoService {
 
     final body =
         (await _jsonDecoder.bind(response.stream).first)! as List<Object?>;
-    return body.cast<Map<String, Object?>>().map(Suite.fromJson).toList();
+    return body
+        .cast<Map<String, Object?>>()
+        .map(BenchmarkRecord.fromJson)
+        .toList();
   }
 }
 

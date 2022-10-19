@@ -1,4 +1,9 @@
+import 'dart:convert';
+
 import 'package:json_annotation/json_annotation.dart';
+
+String prettyFormatJson(Object? object) =>
+    const JsonEncoder.withIndent('  ').convert(object);
 
 class TaggedTypeConverter<T> extends JsonConverter<T, List<Object?>> {
   const TaggedTypeConverter(this.baseType, this.typeToTag, this.tagToConverter);

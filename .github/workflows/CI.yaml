@@ -25,11 +25,11 @@ jobs:
       - name: Bootstrap
         run: melos bootstrap
       - name: Check code generation
-        run: melos code-gen:check
+        run: melos code-gen:check --no-select
       - name: Check formatting
-        run: melos format:check
+        run: melos format:check --no-select
       - name: Analyze
-        run: melos analyze
+        run: melos analyze --no-select
 
   test:
     strategy:
@@ -41,6 +41,11 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+      - name: Install Google Cloud Service Account
+        env:
+          GOOGLE_CLOUD_SERVICE_ACCOUNT: ${{ secrets.GOOGLE_CLOUD_SERVICE_ACCOUNT }}
+        run: echo "$GOOGLE_CLOUD_SERVICE_ACCOUNT" > packages/beto_server/test-service-account.json
+        shell: bash
       - name: Setup Dart
         uses: dart-lang/setup-dart@v1
         with:
@@ -50,4 +55,4 @@ jobs:
       - name: Bootstrap
         run: melos bootstrap
       - name: Test
-        run: melos test
+        run: melos test --no-select

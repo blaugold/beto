@@ -1,10 +1,11 @@
 import 'dart:collection';
 
 import 'package:json_annotation/json_annotation.dart';
+import 'package:uuid/uuid.dart';
 
 import 'environment.dart';
 
-part 'value.g.dart';
+part 'record.g.dart';
 
 enum Statistic {
   average,
@@ -32,7 +33,8 @@ class Value {
 
   final Statistic statistic;
   final double value;
-  final Map<String, Object?> parameters;
+  @_ParametersConverter()
+  final Map<String, String> parameters;
 
   Metric get metric => _metric!;
   Metric? _metric;
@@ -41,6 +43,30 @@ class Value {
   String toString() => 'Value(${metric.qualifiedName} [$statistic]: $value)';
 
   Map<String, Object?> toJson() => _$ValueToJson(this);
+
+  Value clone() => Value(
+        statistic: statistic,
+        value: value,
+        parameters: parameters,
+      );
+}
+
+class _ParametersConverter
+    implements JsonConverter<Map<String, String>, List<Object?>> {
+  const _ParametersConverter();
+
+  @override
+  Map<String, String> fromJson(List<Object?> json) {
+    final entries = json
+        .cast<Map<String, Object?>>()
+        .map((e) => MapEntry(e['name']! as String, e['value']! as String));
+    return Map<String, String>.fromEntries(entries);
+  }
+
+  @override
+  List<Object?> toJson(Map<String, String> object) => object.entries
+      .map((entry) => {'name': entry.key, 'value': entry.value})
+      .toList();
 }
 
 @JsonSerializable()
@@ -75,6 +101,11 @@ class Metric {
   String toString() => 'Metric($qualifiedName)';
 
   Map<String, Object?> toJson() => _$MetricToJson(this);
+
+  Metric clone() => Metric(
+        name: name,
+        values: values.map((value) => value.clone()).toList(),
+      );
 }
 
 @JsonSerializable()
@@ -110,13 +141,17 @@ class Benchmark {
   String toString() => 'Benchmark($qualifiedName)';
 
   Map<String, Object?> toJson() => _$BenchmarkToJson(this);
+
+  Benchmark clone() => Benchmark(
+        name: name,
+        metrics: metrics.map((metric) => metric.clone()).toList(),
+      );
 }
 
 @JsonSerializable()
 class Suite {
   Suite({
     required this.name,
-    required this.environment,
     List<Benchmark>? benchmarks,
   }) {
     benchmarks?.forEach(addBenchmark);
@@ -125,7 +160,9 @@ class Suite {
   factory Suite.fromJson(Map<String, Object?> json) => _$SuiteFromJson(json);
 
   final String name;
-  final Environment environment;
+
+  BenchmarkRecord get record => _record!;
+  BenchmarkRecord? _record;
 
   late final List<Benchmark> benchmarks = UnmodifiableListView(_benchmarks);
 
@@ -141,4 +178,48 @@ class Suite {
   String toString() => 'Suite($name)';
 
   Map<String, Object?> toJson() => _$SuiteToJson(this);
+
+  Suite clone() => Suite(
+        name: name,
+        benchmarks: benchmarks.map((benchmark) => benchmark.clone()).toList(),
+      );
+}
+
+@JsonSerializable()
+class BenchmarkRecord {
+  BenchmarkRecord({
+    String? id,
+    required this.environment,
+    List<Suite>? suites,
+  }) : id = id ?? const Uuid().v4() {
+    suites?.forEach(addSuite);
+  }
+
+  factory BenchmarkRecord.fromJson(Map<String, Object?> json) =>
+      _$BenchmarkRecordFromJson(json);
+
+  final String id;
+  final Environment environment;
+
+  late final List<Suite> suites = UnmodifiableListView(_suites);
+
+  final List<Suite> _suites = [];
+
+  void addSuite(Suite suite) {
+    assert(suite._record == null);
+    suite._record = this;
+    _suites.add(suite);
+  }
+
+  @override
+  String toString() =>
+      'BenchmarkRecord(environment: $environment, suites: $suites)';
+
+  Map<String, Object?> toJson() => _$BenchmarkRecordToJson(this);
+
+  BenchmarkRecord clone() => BenchmarkRecord(
+        id: id,
+        environment: environment,
+        suites: suites.map((suite) => suite.clone()).toList(),
+      );
 }

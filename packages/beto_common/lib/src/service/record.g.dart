@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'value.dart';
+part of 'record.dart';
 
 // **************************************************************************
 // JsonSerializableGenerator
@@ -9,13 +9,15 @@ part of 'value.dart';
 Value _$ValueFromJson(Map<String, dynamic> json) => Value(
       statistic: $enumDecode(_$StatisticEnumMap, json['statistic']),
       value: (json['value'] as num).toDouble(),
-      parameters: json['parameters'] as Map<String, dynamic>? ?? const {},
+      parameters: json['parameters'] == null
+          ? const {}
+          : const _ParametersConverter().fromJson(json['parameters'] as List),
     );
 
 Map<String, dynamic> _$ValueToJson(Value instance) => <String, dynamic>{
       'statistic': _$StatisticEnumMap[instance.statistic]!,
       'value': instance.value,
-      'parameters': instance.parameters,
+      'parameters': const _ParametersConverter().toJson(instance.parameters),
     };
 
 const _$StatisticEnumMap = {
@@ -58,8 +60,6 @@ Map<String, dynamic> _$BenchmarkToJson(Benchmark instance) => <String, dynamic>{
 
 Suite _$SuiteFromJson(Map<String, dynamic> json) => Suite(
       name: json['name'] as String,
-      environment:
-          Environment.fromJson(json['environment'] as Map<String, dynamic>),
       benchmarks: (json['benchmarks'] as List<dynamic>?)
           ?.map((e) => Benchmark.fromJson(e as Map<String, dynamic>))
           .toList(),
@@ -67,6 +67,22 @@ Suite _$SuiteFromJson(Map<String, dynamic> json) => Suite(
 
 Map<String, dynamic> _$SuiteToJson(Suite instance) => <String, dynamic>{
       'name': instance.name,
-      'environment': instance.environment,
       'benchmarks': instance.benchmarks,
+    };
+
+BenchmarkRecord _$BenchmarkRecordFromJson(Map<String, dynamic> json) =>
+    BenchmarkRecord(
+      id: json['id'] as String?,
+      environment:
+          Environment.fromJson(json['environment'] as Map<String, dynamic>),
+      suites: (json['suites'] as List<dynamic>?)
+          ?.map((e) => Suite.fromJson(e as Map<String, dynamic>))
+          .toList(),
+    );
+
+Map<String, dynamic> _$BenchmarkRecordToJson(BenchmarkRecord instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'environment': instance.environment,
+      'suites': instance.suites,
     };
