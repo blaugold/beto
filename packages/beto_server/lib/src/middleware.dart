@@ -9,6 +9,7 @@ import 'package:beto_common/beto_common.dart';
 import 'package:shelf/shelf.dart';
 import 'package:uuid/uuid.dart';
 
+import 'authentication.dart';
 import 'logging.dart';
 
 abstract class HttpException {
@@ -180,6 +181,35 @@ extension RequestIdRequest on Request {
   }
 }
 
-extension RequestIdZone on Zone {
+extension ZoneRequestId on Zone {
   String? get requestId => this[_requestIdContextKey] as String?;
+}
+
+String? get currentRequestId => Zone.current.requestId;
+
+const _authenticationContextKey = 'beto_server.authentication';
+
+Middleware authentication(AuthenticationProvider authenticationProvider) =>
+    (innerHandler) => (request) async {
+          final authentication =
+              await authenticationProvider.authenticate(request);
+          final updatedRequest = request.change(
+            context: {_authenticationContextKey: authentication},
+          );
+          return withAuthentication(
+            authentication,
+            () => innerHandler(updatedRequest),
+          );
+        };
+
+extension RequestAuthentication on Request {
+  bool get hasAuthentication => context.containsKey(_authenticationContextKey);
+
+  Authentication get authentication {
+    final authentication = context[_authenticationContextKey];
+    if (authentication is Authentication) {
+      return authentication;
+    }
+    throw StateError('authentication middleware is not installed.');
+  }
 }
