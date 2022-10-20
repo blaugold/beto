@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'utils.dart';
 
 void main() {
@@ -6,6 +8,9 @@ void main() {
   }
 
   runProcess('melos', ['code-gen', '--no-select']);
+
+  // Wait a bit to make sure the file system has time to update.
+  sleep(const Duration(seconds: 1));
 
   if (isRepositoryDirty()) {
     error('Repository is dirty after running code-gen.');
