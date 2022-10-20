@@ -24,5 +24,6 @@ Never error(String message) {
 }
 
 void printDiff() {
+  // ignore: avoid_print
   print(runProcess('git', ['diff']));
 }
