@@ -21,7 +21,7 @@ class TaggedTypeConverter<T> extends JsonConverter<T, List<Object?>> {
     if (type is! String) {
       throw FormatException('Invalid $baseType: $json');
     }
-    final value = json[2];
+    final value = json[1];
     if (value is! Map<String, Object?>) {
       throw FormatException('Invalid $baseType: $json');
     }
