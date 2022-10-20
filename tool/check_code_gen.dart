@@ -4,6 +4,7 @@ import 'utils.dart';
 
 void main() {
   if (isRepositoryDirty()) {
+    printDiff();
     error('Repository must not be dirty when running check_code_gen.');
   }
 
@@ -13,10 +14,15 @@ void main() {
   sleep(const Duration(seconds: 1));
 
   if (isRepositoryDirty()) {
+    printDiff();
     error('Repository is dirty after running code-gen.');
   }
 }
 
 Never error(String message) {
   throw Exception(message);
+}
+
+void printDiff() {
+  print(runProcess('git', ['diff']));
 }
