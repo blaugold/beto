@@ -34,6 +34,9 @@ class BetoServer {
   final String bigQueryDatasetId;
   final DataStoreImpl dataStoreImpl;
 
+  int get actualPort => _server.port;
+  InternetAddress get actualAddress => _server.address;
+
   late final _configuration = Configuration(
     bigQueryDatasetId: bigQueryDatasetId,
     dataStoreImpl: dataStoreImpl,

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:beto_common/beto_common.dart';
 import 'package:http/http.dart';
@@ -22,10 +23,10 @@ class ApiSecret extends Credentials {
 
 class BetoServiceHttpClient extends BetoService {
   BetoServiceHttpClient({
-    required Client client,
+    Client? client,
     required this.serverUrl,
     required Credentials credentials,
-  }) : client = _Client(client, credentials);
+  }) : client = _Client(client ?? Client(), credentials);
 
   final Client client;
   final Uri serverUrl;
@@ -38,7 +39,13 @@ class BetoServiceHttpClient extends BetoService {
 
   @override
   Future<void> submitBenchmarkData(SubmitBenchmarkDataRequest request) async {
-    await client.post(serverUrl.resolve('/benchmark-data'), body: request);
+    await client.post(
+      serverUrl.resolve('/benchmark-data'),
+      body: _jsonEncoder.convert(request),
+      headers: {
+        HttpHeaders.contentTypeHeader: ContentType.json.toString(),
+      },
+    );
   }
 
   @override
@@ -47,7 +54,10 @@ class BetoServiceHttpClient extends BetoService {
   ) async {
     final httpRequest =
         Request('GET', serverUrl.resolve('/benchmark-data/query'))
-          ..bodyBytes = _jsonEncoder.convert(request);
+          ..bodyBytes = _jsonEncoder.convert(request)
+          ..headers.addAll({
+            HttpHeaders.contentTypeHeader: ContentType.json.toString(),
+          });
 
     final response = await client.send(httpRequest);
 
