@@ -25,22 +25,18 @@ class InMemoryBenchmarkDataStore extends BenchmarkDataStore {
           .toList();
 
   void _sortRecords() {
-    _records.sort(
-      (a, b) => a.environment.startTime.compareTo(b.environment.startTime),
-    );
+    _records.sort((a, b) => a.startTime.compareTo(b.startTime));
   }
 
   List<BenchmarkRecord> _findRecordsInRange(BenchmarkDataRange range) {
     if (range is CommitRange) {
-      return _records
-          .where((record) => record.environment.commit == range.commit)
-          .toList();
+      return _records.where((record) => record.commit == range.commit).toList();
     } else if (range is DateRange) {
       return _records
           .where(
             (record) =>
-                record.environment.startTime.compareTo(range.start) >= 0 &&
-                record.environment.startTime.compareTo(range.end) <= 0,
+                record.startTime.compareTo(range.start) >= 0 &&
+                record.startTime.compareTo(range.end) <= 0,
           )
           .toList();
     } else {
@@ -58,6 +54,8 @@ BenchmarkRecord? _filterRecordData(
 ) {
   final filteredRecord = BenchmarkRecord(
     id: record.id,
+    startTime: record.startTime,
+    commit: record.commit,
     environment: record.environment,
   );
   var filteredRecordIsEmpty = true;

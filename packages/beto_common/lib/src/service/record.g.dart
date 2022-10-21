@@ -73,6 +73,8 @@ Map<String, dynamic> _$SuiteToJson(Suite instance) => <String, dynamic>{
 BenchmarkRecord _$BenchmarkRecordFromJson(Map<String, dynamic> json) =>
     BenchmarkRecord(
       id: json['id'] as String?,
+      startTime: DateTime.parse(json['startTime'] as String),
+      commit: json['commit'] as String?,
       environment:
           Environment.fromJson(json['environment'] as Map<String, dynamic>),
       suites: (json['suites'] as List<dynamic>?)
@@ -83,6 +85,8 @@ BenchmarkRecord _$BenchmarkRecordFromJson(Map<String, dynamic> json) =>
 Map<String, dynamic> _$BenchmarkRecordToJson(BenchmarkRecord instance) =>
     <String, dynamic>{
       'id': instance.id,
+      'startTime': instance.startTime.toIso8601String(),
+      'commit': instance.commit,
       'environment': instance.environment,
       'suites': instance.suites,
     };
