@@ -1,4 +1,7 @@
+// ignore_for_file: avoid_catches_without_on_clauses
+
 import 'dart:async';
+import 'dart:io';
 
 import 'package:beto_common/beto_common.dart';
 
@@ -15,6 +18,9 @@ class BetoServiceImpl extends BetoService {
   @override
   Future<void> submitBenchmarkData(SubmitBenchmarkDataRequest request) async {
     _requireAuthentication();
+    _validateRequest(() {
+      request.record.validate();
+    });
     await benchmarkDataStore.insertBenchmarkRecord(request.record);
   }
 
@@ -34,8 +40,19 @@ class BetoServiceImpl extends BetoService {
   void _requireAuthentication() {
     if (currentAuthentication?.isAuthenticated != true) {
       throw BetoException(
-        statusCode: 401,
+        statusCode: HttpStatus.unauthorized,
         message: 'Authentication required.',
+      );
+    }
+  }
+
+  void _validateRequest(void Function() fn) {
+    try {
+      fn();
+    } catch (e) {
+      throw BetoException(
+        statusCode: HttpStatus.badRequest,
+        message: 'Invalid request: $e',
       );
     }
   }

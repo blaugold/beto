@@ -1,19 +1,36 @@
 import 'dart:collection';
 
 import 'package:json_annotation/json_annotation.dart';
+import 'package:meta/meta.dart';
 import 'package:uuid/uuid.dart';
 
 import 'environment.dart';
+import 'validate.dart';
 
 part 'record.g.dart';
 
 /// A node in a [BenchmarkRecord].
 abstract class BenchmarkDataNode<T> {
+  /// The children of this node.
+  Iterable<BenchmarkDataNode> get children;
+
   /// Returns this node as JSON.
   Object? toJson();
 
   /// Returns a clone of this node.
   T clone();
+
+  /// Validates this node and all its children.
+  void validate() {
+    performValidation();
+    for (final child in children) {
+      child.validate();
+    }
+  }
+
+  /// Performs validation of this node
+  @protected
+  void performValidation();
 }
 
 /// A statistical function used to aggregates values.
@@ -58,6 +75,12 @@ class Value extends BenchmarkDataNode<Value> {
   /// The [Metric] this value belongs to.
   Metric get metric => _metric!;
   Metric? _metric;
+
+  @override
+  Iterable<BenchmarkDataNode> get children => const [];
+
+  @override
+  void performValidation() {}
 
   @override
   String toString() => 'Value(${metric.qualifiedName} [$statistic]: $value)';
@@ -131,6 +154,14 @@ class Metric extends BenchmarkDataNode<Metric> {
   }
 
   @override
+  Iterable<BenchmarkDataNode> get children => values;
+
+  @override
+  void performValidation() {
+    validateAlphaNumericIdentifier('Metric.name', name);
+  }
+
+  @override
   String toString() => 'Metric($qualifiedName)';
 
   @override
@@ -145,7 +176,7 @@ class Metric extends BenchmarkDataNode<Metric> {
 
 /// A benchmark that is part of a [Suite].
 @JsonSerializable()
-class Benchmark {
+class Benchmark extends BenchmarkDataNode<Benchmark> {
   /// Creates a new [Benchmark].
   Benchmark({
     required this.name,
@@ -184,10 +215,20 @@ class Benchmark {
   }
 
   @override
+  Iterable<BenchmarkDataNode> get children => metrics;
+
+  @override
+  void performValidation() {
+    validateAlphaNumericIdentifier('Benchmark.name', name);
+  }
+
+  @override
   String toString() => 'Benchmark($qualifiedName)';
 
+  @override
   Map<String, Object?> toJson() => _$BenchmarkToJson(this);
 
+  @override
   Benchmark clone() => Benchmark(
         name: name,
         metrics: metrics.map((metric) => metric.clone()).toList(),
@@ -196,12 +237,13 @@ class Benchmark {
 
 /// A suite of [Benchmark]s.
 @JsonSerializable()
-class Suite {
+class Suite extends BenchmarkDataNode<Suite> {
   /// Creates a new [Suite].
   Suite({
     required this.name,
     List<Benchmark>? benchmarks,
   }) {
+    validateAlphaNumericIdentifier('Suite.name', name);
     benchmarks?.forEach(addBenchmark);
   }
 
@@ -228,10 +270,20 @@ class Suite {
   }
 
   @override
+  Iterable<BenchmarkDataNode> get children => benchmarks;
+
+  @override
+  void performValidation() {
+    validateAlphaNumericIdentifier('Suite.name', name);
+  }
+
+  @override
   String toString() => 'Suite($name)';
 
+  @override
   Map<String, Object?> toJson() => _$SuiteToJson(this);
 
+  @override
   Suite clone() => Suite(
         name: name,
         benchmarks: benchmarks.map((benchmark) => benchmark.clone()).toList(),
@@ -260,7 +312,13 @@ class BenchmarkRecord extends BenchmarkDataNode<BenchmarkRecord> {
   /// A unique identifier for this record.
   final String id;
 
+  /// The time recording of benchmark data in this record started.
+  ///
+  /// This time is only used to roughly order benchmark data over time.
   final DateTime startTime;
+
+  /// The hash of the commit that contains the executed revision of the
+  /// benchmark.
   final String? commit;
 
   /// The [Environment] in which the benchmarks were executed.
@@ -277,6 +335,12 @@ class BenchmarkRecord extends BenchmarkDataNode<BenchmarkRecord> {
     suite._record = this;
     _suites.add(suite);
   }
+
+  @override
+  Iterable<BenchmarkDataNode> get children => suites;
+
+  @override
+  void performValidation() {}
 
   @override
   String toString() => 'BenchmarkRecord('

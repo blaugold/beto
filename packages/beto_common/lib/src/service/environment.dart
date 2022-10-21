@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:json_annotation/json_annotation.dart';
 
 import '../io_utils.dart';
+import 'validate.dart';
 
 part 'environment.g.dart';
 
@@ -52,6 +53,11 @@ class Environment {
 
   /// The runtime.
   final Runtime? runtime;
+
+  /// Validates this [Environment].
+  void validate() {
+    validateAlphaNumericIdentifier('Environment.device', device);
+  }
 
   @override
   String toString() => 'Environment('
