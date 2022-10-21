@@ -35,14 +35,9 @@ void main() {
   benchmarkStoreTest('query', () async {
     final dataStore = await getBenchmarkDataStore();
     final record = BenchmarkRecord(
-      environment: Environment(
-        cpu: Cpu.current(),
-        device: 'test',
-        os: Os.current(),
-        startTime: DateTime.now(),
-        runtime: Runtime.dart(),
-        commit: 'test',
-      ),
+      startTime: DateTime.now(),
+      commit: 'test',
+      environment: Environment.current(device: 'test'),
       suites: [
         Suite(
           name: 'a',

@@ -69,11 +69,11 @@ class BigQueryBenchmarkDataStore extends BenchmarkDataStore {
   }) async {
     final String rangeCondition;
     if (range is CommitRange) {
-      rangeCondition = 'record.environment.commit = @commit';
+      rangeCondition = 'record.commit = @commit';
     } else if (range is DateRange) {
       rangeCondition = '''
-record.environment.startTime >= @rangeStartDate AND
-record.environment.startTime <= @rangeEndDate
+record.startTime >= @rangeStartDate AND
+record.startTime <= @rangeEndDate
 ''';
     } else {
       throw UnimplementedError(
@@ -84,7 +84,8 @@ record.environment.startTime <= @rangeEndDate
     final query = '''
 SELECT
   record.id AS id,
-  ANY_VALUE(record.environment).startTime AS startTime,
+  UNIX_MILLIS(ANY_VALUE(record).startTime) AS startTime,
+  ANY_VALUE(record).commit AS commit,
   TO_JSON_STRING(ANY_VALUE(record.environment)) AS environment,
   TO_JSON_STRING(ARRAY_CONCAT_AGG(benchmark.metrics)) AS metrics
 FROM
@@ -199,11 +200,15 @@ ORDER BY startTime
     String benchmarkName,
   ) {
     final id = row.f![0].v! as String;
-    final environment = jsonDecode(row.f![2].v! as String);
-    final metrics = jsonDecode(row.f![3].v! as String);
+    final startTime = row.f![1].v! as String;
+    final commit = row.f![2].v as String?;
+    final environment = jsonDecode(row.f![3].v! as String);
+    final metrics = jsonDecode(row.f![4].v! as String);
 
     final record = BenchmarkRecord(
       id: id,
+      startTime: DateTime.fromMillisecondsSinceEpoch(int.parse(startTime)),
+      commit: commit,
       environment: Environment.fromJson(environment as Map<String, Object?>),
     );
     final suite = Suite(name: suiteName);
@@ -309,20 +314,20 @@ Future<Table> _benchmarkDataTableMigration1(
         mode: 'REQUIRED',
       ),
       TableFieldSchema(
+        name: 'startTime',
+        type: 'TIMESTAMP',
+        mode: 'REQUIRED',
+      ),
+      TableFieldSchema(
+        name: 'commit',
+        type: 'STRING',
+        mode: 'NULLABLE',
+      ),
+      TableFieldSchema(
         name: 'environment',
         type: 'RECORD',
         mode: 'REQUIRED',
         fields: [
-          TableFieldSchema(
-            name: 'startTime',
-            type: 'TIMESTAMP',
-            mode: 'REQUIRED',
-          ),
-          TableFieldSchema(
-            name: 'commit',
-            type: 'STRING',
-            mode: 'NULLABLE',
-          ),
           TableFieldSchema(
             name: 'device',
             type: 'STRING',

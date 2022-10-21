@@ -9,5 +9,12 @@ export 'src/service/message.dart'
         QueryBenchmarkDataRequest,
         SubmitBenchmarkDataRequest;
 export 'src/service/record.dart'
-    show Benchmark, BenchmarkRecord, Metric, Statistic, Suite, Value;
+    show
+        Benchmark,
+        BenchmarkDataNode,
+        BenchmarkRecord,
+        Metric,
+        Statistic,
+        Suite,
+        Value;
 export 'src/service/service.dart' show BetoService;

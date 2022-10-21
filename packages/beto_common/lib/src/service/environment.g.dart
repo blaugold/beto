@@ -7,8 +7,6 @@ part of 'environment.dart';
 // **************************************************************************
 
 Environment _$EnvironmentFromJson(Map<String, dynamic> json) => Environment(
-      startTime: DateTime.parse(json['startTime'] as String),
-      commit: json['commit'] as String?,
       device: json['device'] as String,
       os: Os.fromJson(json['os'] as Map<String, dynamic>),
       cpu: Cpu.fromJson(json['cpu'] as Map<String, dynamic>),
@@ -19,8 +17,6 @@ Environment _$EnvironmentFromJson(Map<String, dynamic> json) => Environment(
 
 Map<String, dynamic> _$EnvironmentToJson(Environment instance) =>
     <String, dynamic>{
-      'startTime': instance.startTime.toIso8601String(),
-      'commit': instance.commit,
       'device': instance.device,
       'os': instance.os,
       'cpu': instance.cpu,
