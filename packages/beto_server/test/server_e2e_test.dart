@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:beto_client/beto_client.dart';
 import 'package:beto_common/beto_common.dart';
 import 'package:beto_server/beto_server.dart';
@@ -17,6 +19,7 @@ void main() {
 
   final server = BetoServer(
     apiSecrets: [apiSecretCredentials.apiSecret],
+    address: InternetAddress.loopbackIPv4,
     logRequests: true,
     useRequestCounter: true,
     services: services,
