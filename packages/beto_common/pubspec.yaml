@@ -1,5 +1,5 @@
 name: beto_common
-version: 0.0.0
+version: 0.1.0
 description: Common components for the Beto benchmarking tool.
 repository: https://github.com/blaugold/beto
 homepage: https://github.com/blaugold/beto/tree/main/packages/beto_common
