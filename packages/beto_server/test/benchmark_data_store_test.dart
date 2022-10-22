@@ -1,23 +1,23 @@
 import 'dart:async';
 
 import 'package:beto_common/beto_common.dart';
-import 'package:beto_server/src/configuration.dart';
 import 'package:beto_server/src/logging.dart';
+import 'package:beto_server/src/services.dart';
 import 'package:beto_server/src/storage/benchmark_data_store.dart';
 import 'package:googleapis/bigquery/v2.dart';
 import 'package:logging/logging.dart';
 import 'package:meta/meta.dart';
 import 'package:test/test.dart';
 
-final bigQueryConfiguration = Configuration(
-  googleCloudServiceAccountJsonPath: 'test-service-account.json',
+final bigQueryServices = Services(
+  gcpServiceAccount: 'test-service-account.json',
   bigQueryDatasetId: 'test_${DateTime.now().millisecondsSinceEpoch}',
   // ignore: avoid_redundant_argument_values
-  dataStoreImpl: DataStoreImpl.bigQuery,
+  benchmarkDataStoreType: BenchmarkDataStoreType.bigQuery,
 );
 
-final inMemoryConfiguration = Configuration(
-  dataStoreImpl: DataStoreImpl.inMemory,
+final inMemoryServices = Services(
+  benchmarkDataStoreType: BenchmarkDataStoreType.inMemory,
 );
 
 void main() {
@@ -26,10 +26,10 @@ void main() {
   });
 
   tearDownAll(() async {
-    await bigQueryConfiguration
-        .deleteBigQueryDataset(bigQueryConfiguration.bigQueryDatasetId);
-    await bigQueryConfiguration.dispose();
-    await inMemoryConfiguration.dispose();
+    await bigQueryServices
+        .deleteBigQueryDataset(bigQueryServices.bigQueryDatasetId);
+    await bigQueryServices.dispose();
+    await inMemoryServices.dispose();
   });
 
   benchmarkStoreTest('query', () async {
@@ -117,7 +117,7 @@ void benchmarkStoreTest(String name, FutureOr<void> Function() body) {
         body,
         zoneValues: {
           #getBenchmarkDataStore: () async =>
-              inMemoryConfiguration.benchmarkDataStore,
+              inMemoryServices.benchmarkDataStore,
         },
       ),
     );
@@ -128,14 +128,14 @@ void benchmarkStoreTest(String name, FutureOr<void> Function() body) {
         body,
         zoneValues: {
           #getBenchmarkDataStore: () async =>
-              bigQueryConfiguration.benchmarkDataStore,
+              bigQueryServices.benchmarkDataStore,
         },
       ),
     );
   });
 }
 
-extension on Configuration {
+extension on Services {
   Future<void> deleteBigQueryDataset(String datasetId) async {
     final bigQueryApi = await this.bigQueryApi;
     try {

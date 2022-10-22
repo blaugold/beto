@@ -8,12 +8,14 @@ bin:
   beto_server:
 
 dependencies:
+  args: ^2.3.1
   beto_common: ^0.0.0
   googleapis: ^9.2.0
   googleapis_auth: ^1.3.1
   http: ^0.13.5
   logging: ^1.1.0
   meta: ^1.8.0
+  recase: ^4.1.0
   shelf: ^1.4.0
   shelf_router: ^1.1.3
   uuid: ^3.0.6
