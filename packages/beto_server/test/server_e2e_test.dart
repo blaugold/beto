@@ -1,8 +1,8 @@
 import 'package:beto_client/beto_client.dart';
 import 'package:beto_common/beto_common.dart';
 import 'package:beto_server/beto_server.dart';
-import 'package:beto_server/src/configuration.dart';
 import 'package:beto_server/src/logging.dart';
+import 'package:beto_server/src/services.dart';
 import 'package:logging/logging.dart';
 import 'package:test/test.dart';
 
@@ -11,11 +11,15 @@ void main() {
 
   const apiSecretCredentials = ApiSecret('secret');
 
+  final services = Services(
+    benchmarkDataStoreType: BenchmarkDataStoreType.inMemory,
+  );
+
   final server = BetoServer(
-    dataStoreImpl: DataStoreImpl.inMemory,
     apiSecrets: [apiSecretCredentials.apiSecret],
     logRequests: true,
     useRequestCounter: true,
+    services: services,
   );
 
   late final serverUrl = Uri(
@@ -26,6 +30,7 @@ void main() {
 
   setUpAll(server.start);
   tearDownAll(server.stop);
+  tearDownAll(services.dispose);
 
   test('make request with unauthorized credentials', () async {
     final client = BetoServiceHttpClient(

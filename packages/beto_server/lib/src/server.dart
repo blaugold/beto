@@ -12,6 +12,60 @@ import 'configuration.dart';
 import 'logging.dart';
 import 'middleware.dart';
 import 'service_handler.dart';
+import 'services.dart';
+
+final _port = IntegerOption(
+  name: 'port',
+  description: 'The port to listen on. When set to 0, a random port will be '
+      'selected.',
+  defaultValue: 8080,
+  abbreviation: 'p',
+);
+
+final _address = InternetAddressOption(
+  name: 'address',
+  description: 'The address to listen on.',
+  defaultValue: InternetAddress.anyIPv4,
+  abbreviation: 'a',
+);
+
+final _logRequests = FlagOption(
+  name: 'logRequest',
+  description: 'Whether to log requests.',
+  defaultValue: false,
+);
+
+final _useRequestCounter = FlagOption(
+  name: 'useRequestCounter',
+  description:
+      'Whether to use a request counter to generate request IDs instead of '
+      'using a UUID.',
+  defaultValue: false,
+);
+
+final _apiSecrets = ListOption<String>(
+  option: StringOption(
+    name: 'apiSecrets',
+    description: 'The API secrets to use for authentication.',
+  ),
+  defaultValue: [],
+);
+
+final List<Option> serverOptions = [
+  _port,
+  _address,
+  _logRequests,
+  _useRequestCounter,
+  _apiSecrets,
+];
+
+extension ServerOptions on Options {
+  int get port => get(_port);
+  InternetAddress get address => get(_address);
+  bool get logRequests => get(_logRequests);
+  bool get useRequestCounter => get(_useRequestCounter);
+  List<String> get apiSecrets => get(_apiSecrets);
+}
 
 class BetoServer {
   BetoServer({
@@ -20,9 +74,7 @@ class BetoServer {
     this.logRequests = false,
     this.useRequestCounter = false,
     this.apiSecrets = const [],
-    this.googleCloudServiceAccountJsonPath = 'service-account.json',
-    this.bigQueryDatasetId = 'beto_benchmark_data',
-    this.dataStoreImpl = DataStoreImpl.bigQuery,
+    required this.services,
   });
 
   final int? port;
@@ -30,18 +82,10 @@ class BetoServer {
   final bool logRequests;
   final bool useRequestCounter;
   final List<String> apiSecrets;
-  final String googleCloudServiceAccountJsonPath;
-  final String bigQueryDatasetId;
-  final DataStoreImpl dataStoreImpl;
+  final Services services;
 
   int get actualPort => _server.port;
   InternetAddress get actualAddress => _server.address;
-
-  late final _configuration = Configuration(
-    bigQueryDatasetId: bigQueryDatasetId,
-    dataStoreImpl: dataStoreImpl,
-    googleCloudServiceAccountJsonPath: googleCloudServiceAccountJsonPath,
-  );
 
   int get _port => port ?? 0;
   InternetAddress get _address => address ?? InternetAddress.loopbackIPv4;
@@ -49,7 +93,7 @@ class BetoServer {
   late HttpServer _server;
 
   Future<void> start() async {
-    final handler = _createHandler(await _configuration.betoService);
+    final handler = _createHandler(await services.betoService);
 
     final server = _server = await shelf_io.serve(
       handler,
@@ -59,8 +103,6 @@ class BetoServer {
     );
     // ignore: cascade_invocations
     server.autoCompress = true;
-
-    _configuration.addDisposeAction(server.close);
 
     logger.info('Listening on http://${_server.address.host}:${_server.port}');
   }
@@ -91,6 +133,6 @@ class BetoServer {
 
   Future<void> stop() async {
     logger.info('Stopping server...');
-    await _configuration.dispose();
+    await _server.close();
   }
 }
