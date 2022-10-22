@@ -10,7 +10,7 @@ import 'package:meta/meta.dart';
 import 'package:test/test.dart';
 
 final bigQueryServices = Services(
-  googleCloudServiceAccountJsonPath: 'test-service-account.json',
+  gcpServiceAccount: 'test-service-account.json',
   bigQueryDatasetId: 'test_${DateTime.now().millisecondsSinceEpoch}',
   // ignore: avoid_redundant_argument_values
   benchmarkDataStoreType: BenchmarkDataStoreType.bigQuery,

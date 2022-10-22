@@ -223,6 +223,10 @@ class InternetAddressOption extends SimpleOption<InternetAddress> {
 
   @override
   InternetAddress valueFromString(String value) {
+    if (value == 'localhost') {
+      return InternetAddress.loopbackIPv4;
+    }
+
     try {
       return InternetAddress(value);
       // ignore: avoid_catching_errors

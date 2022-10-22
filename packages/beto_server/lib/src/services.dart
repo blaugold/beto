@@ -14,24 +14,30 @@ import 'storage/benchmark_data_store.dart';
 import 'storage/big_query_benchmark_data_store.dart';
 import 'storage/in_memory_benchmark_data_store.dart';
 
+const _gcpServiceAccountDefault = 'service-account.json';
+
 final _gcpServiceAccount = StringOption(
   name: 'gcpServiceAccount',
   description: 'The path to the GCP service account JSON file to use '
       'when accessing GCP services.',
-  defaultValue: 'service-account.json',
+  defaultValue: _gcpServiceAccountDefault,
 );
+
+const _bigQueryDatasetIdDefault = 'benchmark_data';
 
 final _bigQueryDatasetId = StringOption(
   name: 'bigQueryDatasetId',
   description: 'The ID of the BigQuery dataset to store benchmark data in.',
-  defaultValue: 'beto_benchmark_data',
+  defaultValue: _bigQueryDatasetIdDefault,
 );
+
+const _benchmarkDataStoreTypeDefault = BenchmarkDataStoreType.bigQuery;
 
 final _benchmarkDataStore = EnumOption(
   name: 'benchmarkDataStore',
   description: 'The store to use for storing benchmark data.',
   allowedValues: BenchmarkDataStoreType.values,
-  defaultValue: BenchmarkDataStoreType.bigQuery,
+  defaultValue: _benchmarkDataStoreTypeDefault,
 );
 
 final List<Option> servicesOptions = [
@@ -54,16 +60,16 @@ enum BenchmarkDataStoreType {
 
 class Services {
   Services({
-    this.googleCloudServiceAccountJsonPath = 'service-account.json',
-    this.bigQueryDatasetId = 'beto_benchmark_data',
-    this.benchmarkDataStoreType = BenchmarkDataStoreType.bigQuery,
+    this.gcpServiceAccount = _gcpServiceAccountDefault,
+    this.bigQueryDatasetId = _bigQueryDatasetIdDefault,
+    this.benchmarkDataStoreType = _benchmarkDataStoreTypeDefault,
   });
 
   static const _googleCloudScopes = [BigqueryApi.bigqueryScope];
   static const _googleCloudProjectIdMetadataUrl =
       'http://metadata.google.internal/computeMetadata/v1/project/project-id';
 
-  final String googleCloudServiceAccountJsonPath;
+  final String gcpServiceAccount;
   final String bigQueryDatasetId;
   final BenchmarkDataStoreType benchmarkDataStoreType;
 
@@ -76,7 +82,7 @@ class Services {
   late final betoService = _createBetoService();
 
   late final _googleCloudServiceAccountJsonExists =
-      File(googleCloudServiceAccountJsonPath).existsSync();
+      File(gcpServiceAccount).existsSync();
 
   final _disposeActions = <FutureOr<void> Function()>[];
 
@@ -97,7 +103,7 @@ class Services {
   }
 
   Future<Map<String, Object?>> _loadServiceAccountJson() async {
-    final serviceAccountFile = File(googleCloudServiceAccountJsonPath);
+    final serviceAccountFile = File(gcpServiceAccount);
     final serviceAccountJson = await serviceAccountFile.readAsString();
     return jsonDecode(serviceAccountJson) as Map<String, Object?>;
   }
@@ -141,8 +147,7 @@ class Services {
 
   Future<AccessCredentials>
       _obtainAccessCredentialsViaServiceAccountFile() async {
-    final credentialsString =
-        await File(googleCloudServiceAccountJsonPath).readAsString();
+    final credentialsString = await File(gcpServiceAccount).readAsString();
     ServiceAccountCredentials credentials;
     try {
       credentials =

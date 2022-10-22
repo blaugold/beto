@@ -14,18 +14,22 @@ import 'middleware.dart';
 import 'service_handler.dart';
 import 'services.dart';
 
+const _portDefault = 8080;
+
 final _port = IntegerOption(
   name: 'port',
   description: 'The port to listen on. When set to 0, a random port will be '
       'selected.',
-  defaultValue: 8080,
+  defaultValue: _portDefault,
   abbreviation: 'p',
 );
+
+final _addressDefault = InternetAddress.anyIPv4;
 
 final _address = InternetAddressOption(
   name: 'address',
   description: 'The address to listen on.',
-  defaultValue: InternetAddress.anyIPv4,
+  defaultValue: _addressDefault,
   abbreviation: 'a',
 );
 
@@ -69,26 +73,22 @@ extension ServerOptions on Options {
 
 class BetoServer {
   BetoServer({
-    this.port,
-    this.address,
+    this.port = _portDefault,
+    InternetAddress? address,
     this.logRequests = false,
     this.useRequestCounter = false,
     this.apiSecrets = const [],
     required this.services,
-  });
+  }) : address = address ?? _addressDefault;
 
-  final int? port;
-  final InternetAddress? address;
+  final int port;
+  final InternetAddress address;
   final bool logRequests;
   final bool useRequestCounter;
   final List<String> apiSecrets;
   final Services services;
 
   int get actualPort => _server.port;
-  InternetAddress get actualAddress => _server.address;
-
-  int get _port => port ?? 0;
-  InternetAddress get _address => address ?? InternetAddress.loopbackIPv4;
 
   late HttpServer _server;
 
@@ -97,8 +97,8 @@ class BetoServer {
 
     final server = _server = await shelf_io.serve(
       handler,
-      _address,
-      _port,
+      address,
+      port,
       poweredByHeader: null,
     );
     // ignore: cascade_invocations

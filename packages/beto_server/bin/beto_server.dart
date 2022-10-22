@@ -25,7 +25,7 @@ void main(List<String> arguments) async {
   );
 
   final services = Services(
-    googleCloudServiceAccountJsonPath: options.gcpServiceAccount,
+    gcpServiceAccount: options.gcpServiceAccount,
     bigQueryDatasetId: options.bigQueryDatasetId,
     benchmarkDataStoreType: options.benchmarkDataStore,
   );

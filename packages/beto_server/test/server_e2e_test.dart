@@ -24,7 +24,7 @@ void main() {
 
   late final serverUrl = Uri(
     scheme: 'http',
-    host: server.actualAddress.address,
+    host: server.address.host,
     port: server.actualPort,
   );
 
