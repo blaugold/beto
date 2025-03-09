@@ -25,5 +25,5 @@ dependencies:
   uuid: ^4.0.0
 
 dev_dependencies:
-  beto_client: ^0.1.0
+  beto_client: ^0.1.0+0
   test: ^1.21.6
