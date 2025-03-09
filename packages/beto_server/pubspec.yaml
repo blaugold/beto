@@ -13,7 +13,7 @@ bin:
 
 dependencies:
   args: ^2.3.1
-  beto_common: ^0.1.0
+  beto_common: ^0.1.0+0
   googleapis: ^13.0.0
   googleapis_auth: ^1.6.0
   http: ^1.0.0

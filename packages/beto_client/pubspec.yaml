@@ -9,5 +9,5 @@ environment:
   sdk: ^3.0.0
 
 dependencies:
-  beto_common: ^0.1.0
+  beto_common: ^0.1.0+0
   http: ^1.0.0
