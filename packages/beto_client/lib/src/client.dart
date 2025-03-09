@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:beto_common/beto_common.dart';
 import 'package:http/http.dart';
 
+// ignore: one_member_abstracts
 abstract class Credentials {
   const Credentials();
 

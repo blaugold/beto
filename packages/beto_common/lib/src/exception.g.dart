@@ -8,7 +8,7 @@ part of 'exception.dart';
 
 BetoException _$BetoExceptionFromJson(Map<String, dynamic> json) =>
     BetoException(
-      statusCode: json['statusCode'] as int,
+      statusCode: (json['statusCode'] as num).toInt(),
       message: json['message'] as String,
     );
 

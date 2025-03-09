@@ -6,8 +6,8 @@ homepage: https://github.com/blaugold/beto/tree/main/packages/beto_client
 issue_tracker: https://github.com/blaugold/beto/issues
 
 environment:
-  sdk: '>=2.18.0 <3.0.0'
+  sdk: ^3.0.0
 
 dependencies:
   beto_common: ^0.1.0
-  http: ^0.13.5
+  http: ^1.0.0

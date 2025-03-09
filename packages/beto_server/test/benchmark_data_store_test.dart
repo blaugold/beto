@@ -54,7 +54,7 @@ void main() {
                       parameters: {'a': 'aa'},
                     ),
                   ],
-                )
+                ),
               ],
             ),
             Benchmark(
@@ -69,7 +69,7 @@ void main() {
                       parameters: {'b': 'bb'},
                     ),
                   ],
-                )
+                ),
               ],
             ),
           ],

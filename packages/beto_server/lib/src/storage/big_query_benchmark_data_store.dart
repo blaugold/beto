@@ -37,7 +37,7 @@ class BigQueryBenchmarkDataStore extends BenchmarkDataStore {
       TableDataInsertAllRequest(
         rows: [
           TableDataInsertAllRequestRows(
-            json: JsonObject.fromJson(record.toJson()),
+            json: record.toJson(),
           ),
         ],
       ),
@@ -152,7 +152,7 @@ ORDER BY startTime
           type: 'STRING',
         ),
         parameterValue: QueryParameterValue(value: benchmark),
-      )
+      ),
     ];
 
     final response = await bigQueryApi.jobs.query(
@@ -299,7 +299,7 @@ typedef _TableMigration = Future<Table> Function(
 );
 
 const _benchmarkDataTableMigrations = <_TableMigration>[
-  _benchmarkDataTableMigration1
+  _benchmarkDataTableMigration1,
 ];
 
 Future<Table> _benchmarkDataTableMigration1(
@@ -460,7 +460,7 @@ Future<Table> _benchmarkDataTableMigration1(
             ],
           ),
         ],
-      )
+      ),
     ],
   );
 
