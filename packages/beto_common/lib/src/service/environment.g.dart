@@ -44,7 +44,7 @@ const _$OsTypeEnumMap = {
 Cpu _$CpuFromJson(Map<String, dynamic> json) => Cpu(
       model: json['model'] as String,
       arch: $enumDecode(_$ArchEnumMap, json['arch']),
-      cores: json['cores'] as int,
+      cores: (json['cores'] as num).toInt(),
     );
 
 Map<String, dynamic> _$CpuToJson(Cpu instance) => <String, dynamic>{
