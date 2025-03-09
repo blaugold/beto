@@ -15,6 +15,25 @@ Packages with breaking changes:
 
 Packages with other changes:
 
+ - [`beto_server` - `v0.1.0+2`](#beto_server---v0102)
+
+---
+
+#### `beto_server` - `v0.1.0+2`
+
+
+## 2025-03-09
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - There are no breaking changes in this release.
+
+Packages with other changes:
+
  - [`beto_client` - `v0.1.0+0`](#beto_client---v0100)
 
 ---
